@@ -1,0 +1,37 @@
+name: 🤖 我的第一个自动流程
+
+# 触发条件：当你 push 代码到 main 分支时触发
+on:
+  push:
+    branches: [ "main" ]
+
+# 定义任务
+jobs:
+  run-python-script:
+    # 在 GitHub 提供的最新 Ubuntu 系统上运行
+    runs-on: ubuntu-latest
+
+    steps:
+      # 步骤 1: 检出代码（把你的仓库代码下载到这台虚拟机里）
+      - name: 📥 下载代码
+        uses: actions/checkout@v3
+
+      # 步骤 2: 安装 Python 环境
+      - name: 🐍 安装 Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      # 步骤 3: 【关键】注入 Secrets 到环境变量
+      # 这一步把你 GitHub 网页上配的 MOONSHOT_API_KEY 变成系统环境变量
+      - name: 🔑 注入 API Key
+        env:
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+        # 这一步其实不需要跑命令，只是声明 env，下一步的 run 就能读到
+        run: echo "环境变量已准备"
+
+      # 步骤 4: 运行你的 Python 脚本
+      - name: 🏃 运行测试脚本
+        env:
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+        run: python test_action.py
